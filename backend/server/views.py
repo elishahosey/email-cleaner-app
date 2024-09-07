@@ -11,6 +11,6 @@ from .runGmail.emailManage import main
 def run_gmail(request):
         try:
             result = main()
-            return JsonResponse({"status": "success", "output": result.stdout})
+            return JsonResponse({"status": "success", "output": result})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)

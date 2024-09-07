@@ -6,10 +6,10 @@ function Intro() {
 
   const navigate = useNavigate();
   const sendToLogin = async () => {
-    navigate('/api')
     try {
       const response = await axios.post('http://localhost:8000/api');
       console.log(response.data); // Print the JSON response from the server
+      navigate('/dashboard');
   }
     catch (error) {
       console.error('Error running script:', error);
