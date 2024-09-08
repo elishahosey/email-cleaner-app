@@ -65,27 +65,12 @@ def main():
     #gather list of each label of the user
     labels = fetch_user_labels(service)
     
-    
-     #TODO go by each label, grab the amount of emails for each of them, pass them off to dashboard
-    label_emails = {}
-    
-    # for label in labels:
-    #   print(label["name"])
-    #   print("id: ",label["id"])
-    
-    for label in labels:
-      name = str(label["name"])
-      print(name)
-      emails = fetch_emails_per_label( service,label["id"])
-      label_emails[name] = get_email_length(emails)
-    
-    print("this is the labels and their numbers: \n")
-    print(label_emails) 
-    
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
+    
+  return service
 
 def fetch_emails_per_label(service, label_id):
   
@@ -116,6 +101,19 @@ def fetch_user_labels(service):
       return None
   
   return labels
+
+#labels + email length
+def get_emailData(labels,service):
+  label_emails = {}
+    
+    
+  for label in labels:
+    name = str(label["name"])
+    emails = fetch_emails_per_label( service,label["id"])
+    label_emails[name] = get_email_length(emails)
+    
+  return label_emails
+
     
 
 # if __name__ == "__main__":
