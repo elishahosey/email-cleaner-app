@@ -113,8 +113,3 @@ def get_emailData(labels,service):
     label_emails[name] = get_email_length(emails)
     
   return label_emails
-
-    
-
-# if __name__ == "__main__":
-#   main()
