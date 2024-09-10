@@ -11,8 +11,8 @@ from google.auth.exceptions import RefreshError
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials file')
-TOKEN_FILE = os.path.join(BASE_DIR, 'token file')
+CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
+TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 
 # Print statements to debug file paths
 print("Base Directory:", BASE_DIR)
@@ -28,8 +28,8 @@ def main():
   # created automatically when the authorization flow completes for the first
   # time.
   
-  if os.path.exists("token.json"):
-    creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+  if os.path.exists(TOKEN_FILE):
+    creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
     
   # If there are no (valid) credentials available, let the user log in.
   if not creds or not creds.valid:
@@ -41,18 +41,18 @@ def main():
           except RefreshError:   
             print("Failed to refresh token, re-authenticating...")
             flow = InstalledAppFlow.from_client_secrets_file(
-                    "credentials.json", SCOPES
+                    CREDENTIALS_FILE, SCOPES
                 )
             creds = flow.run_local_server(port=8080)    
     else:
       flow = InstalledAppFlow.from_client_secrets_file(
-          "credentials.json", SCOPES
+          CREDENTIALS_FILE, SCOPES
       )
       creds = flow.run_local_server(port=8080)
       
       
     # Save the credentials for the next run
-    with open("token.json", "w") as token:
+    with open(TOKEN_FILE, "w") as token:
       token.write(creds.to_json())
     
 
@@ -65,27 +65,12 @@ def main():
     #gather list of each label of the user
     labels = fetch_user_labels(service)
     
-    
-     #TODO go by each label, grab the amount of emails for each of them, pass them off to dashboard
-    label_emails = {}
-    
-    # for label in labels:
-    #   print(label["name"])
-    #   print("id: ",label["id"])
-    
-    for label in labels:
-      name = str(label["name"])
-      print(name)
-      emails = fetch_emails_per_label( service,label["id"])
-      label_emails[name] = get_email_length(emails)
-    
-    print("this is the labels and their numbers: \n")
-    print(label_emails) 
-    
 
   except HttpError as error:
     # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
+    
+  return service
 
 def fetch_emails_per_label(service, label_id):
   
@@ -116,7 +101,15 @@ def fetch_user_labels(service):
       return None
   
   return labels
-    
 
-# if __name__ == "__main__":
-#   main()
+#labels + email length
+def get_emailData(labels,service):
+  label_emails = {}
+    
+    
+  for label in labels:
+    name = str(label["name"])
+    emails = fetch_emails_per_label( service,label["id"])
+    label_emails[name] = get_email_length(emails)
+    
+  return label_emails
