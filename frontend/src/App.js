@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
-import Intro from './Intro/introduction';
-import BarChart from './BarChart/chart'
+import Intro from './Intro/introduction.js';
+import BarChart from './BarChart/chart.js'
 import { Routes, Route } from 'react-router-dom'
 
 function App() {

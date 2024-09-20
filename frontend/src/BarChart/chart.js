@@ -27,6 +27,10 @@ ChartJS.register(
   BarController
 );
 
+const handleBarClick = (event, elements) => {
+ console.log("ELEMENTS",elements)
+}
+
 const get_emailDataset = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api');
@@ -57,7 +61,7 @@ const BarChart = () => {
   const shortenLabels = Object.keys(labelsGmail).map(label => truncateLabel(label));
   
 
-  //TODO: pass data to chart and style it
+  
   const data = {
     labels: shortenLabels,
     datasets: [
@@ -71,13 +75,40 @@ const BarChart = () => {
     ],
   };
 
+  //TODO: Make chart bars clickable for further analysis
   const options = {
+    events: ['click'],
     elements: {
       bar: {
         borderRadius: 40,
         borderWidth: 0.7,
       },
     },
+    onClick: (event,chart)=> {
+      chart = ChartJS.instances
+      if(chart){
+        // get element from coordinates and metaset
+        const xClick = event.native.offsetX
+        const yClick = event.native.offsetY
+        const meta = chart.getDatasetMeta(0)
+        console.log("XCLICK: ",xClick)
+        console.log("EVENT: ",event)
+        console.log("CHART: ",chart)
+        console.log("META: ",meta)
+
+      }else{
+        console.log("Chart does not exist")
+      }
+      // Get the elements that were clicked
+      // const elements = chartInstance.getElementsAtEventForMode(event, 'nearest', { intersect: true }, false);
+      
+    //   if (elements.length) {
+    //     console.log('Clicked Element:', elements[0]);
+    //   } else {
+    //     console.log('No element clicked');
+    // }
+  },
+    // onClick: (e)=> handleBarClick(e,elements),
     layout: {
       padding: {
         left: 5,
