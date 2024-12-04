@@ -6,15 +6,19 @@
     "configurations": [
         {
             "name": "Python Debugger: Django",
-            "type": "debugpy",
+            "type": "python",
             "request": "launch",
             "args": [
                 "runserver",
-                "9000"
+                "0.0.0.0:8000"
             ],
             "django": true,
             "autoStartBrowser": false,
-            "program": "${workspaceFolder}\\backend\\manage.py"
+            "program": "${workspaceFolder}\\backend\\manage.py",
+            "console":"integratedTerminal",
+            "env": {
+                "DJANGO_SETTINGS_MODULE": "backend.settings"
+              }
         }
     ]
 }

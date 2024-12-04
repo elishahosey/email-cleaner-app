@@ -56,8 +56,6 @@ const BarChart = () => {
   
   const shortenLabels = Object.keys(labelsGmail).map(label => truncateLabel(label));
   
-
-  //TODO: pass data to chart and style it
   const data = {
     labels: shortenLabels,
     datasets: [

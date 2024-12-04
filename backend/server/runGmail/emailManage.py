@@ -103,7 +103,7 @@ def fetch_user_labels(service):
   return labels
 
 #labels + email length
-def get_emailData(labels,service):
+def get_emailLengthForLabels(labels,service):
   label_emails = {}
     
     
