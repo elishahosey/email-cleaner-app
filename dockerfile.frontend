@@ -1,0 +1,16 @@
+FROM node:18-alpine as frontend
+
+WORKDIR /email-cleaner-app/
+
+# Copy package.json files for npm install
+COPY ./frontend/package*.json ./
+
+RUN npm install
+
+COPY ./frontend .
+
+CMD ["npm", "start"]
+
+
+
+
