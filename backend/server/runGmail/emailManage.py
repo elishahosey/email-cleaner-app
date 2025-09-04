@@ -8,7 +8,9 @@ from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
+          "https://www.googleapis.com/auth/gmail.modify",
+          'https://mail.google.com/']
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
@@ -67,7 +69,6 @@ def main():
     
 
   except HttpError as error:
-    # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
     
   return service
@@ -83,6 +84,11 @@ def fetch_emails_per_label(service, label_id):
         page_token = response['nextPageToken']
         response = service.users().messages().list(userId='me', labelIds=[label_id], pageToken=page_token).execute()
         emails.extend(response.get('messages', []))
+        
+        '''
+        Example of response
+        Fetched emails [{'id': '18cd007cd4b5840e', 'threadId': '18cd007cd4b5840e'}, {'id': '18ccbdee6fd7191f', 'threadId': '18ccbdee6fd7191f'}, {'id': '18ccbde9532443a1', 'threadId': '18ccbde9532443a1'}]
+        '''
    return emails
 
 def get_email_length(emails):
@@ -113,3 +119,69 @@ def get_emailLengthForLabels(labels,service):
     label_emails[name] = get_email_length(emails)
     
   return label_emails
+
+def delete_emails_by_label_keyword(
+    service,
+    keyword,
+    permanently=False,     # False = move to Trash (reversible). True = delete forever.
+    max_per_label=None,    # Optional cap per label during testing
+    dry_run=False          # Set False to actually modify
+):
+    try:
+        # Find matching labels
+        labels = service.users().labels().list(userId="me").execute().get("labels", [])
+        match = [L for L in labels if keyword.upper() in L["name"].upper()]
+        if not match:
+            print(f"No labels matched '{keyword}'.")
+            return
+
+        # Gather all message IDs for those labels
+        msg_ids = set()
+        for L in match:
+            lid = L["id"]
+            count = 0
+            page_token = None
+            while True:
+                resp = service.users().messages().list(
+                    userId="me", labelIds=[lid], pageToken=page_token
+                ).execute()
+                for m in resp.get("messages", []):
+                    msg_ids.add(m["id"])
+                    count += 1
+                    if max_per_label and count >= max_per_label:
+                        break
+                if (max_per_label and count >= max_per_label) or "nextPageToken" not in resp:
+                    break
+                page_token = resp["nextPageToken"]
+
+        if not msg_ids:
+            print("No messages found under matching labels.")
+            return
+
+        print(f"Matched labels: {[L['name'] for L in match]}")
+        print(f"Total unique messages: {len(msg_ids)}")
+
+        if dry_run:
+            sample = list(msg_ids)[:10]
+            print(f"[DRY RUN] Would {'permanently DELETE' if permanently else 'TRASH'} {len(msg_ids)} messages.")
+            print(f"Sample IDs: {sample}")
+            return
+
+        #Modify in batches
+        ids_list = list(msg_ids)
+        for i in range(0, len(ids_list), 1000):
+            print(f"Processing batch {i//1000 + 1}...")
+            chunk = ids_list[i:i+1000]
+            if permanently:
+                service.users().messages().batchDelete(
+                    userId="me", body={"ids": chunk}
+                ).execute()
+            else:
+                service.users().messages().batchModify(
+                    userId="me", body={"ids": chunk, "addLabelIds": ["TRASH"], "removeLabelIds": []}
+                ).execute()
+
+        print(f"{'Permanently deleted' if permanently else 'Trashed'} {len(msg_ids)} messages.")
+
+    except HttpError as e:
+        print(f"Gmail API error: {e}")

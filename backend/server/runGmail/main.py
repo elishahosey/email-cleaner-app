@@ -47,7 +47,6 @@ def main():
       print(label["name"])
 
   except HttpError as error:
-    # TODO(developer) - Handle errors from gmail API.
     print(f"An error occurred: {error}")
 
 
