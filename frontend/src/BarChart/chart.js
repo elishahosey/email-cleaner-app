@@ -29,8 +29,21 @@ ChartJS.register(
 
 const get_emailDataset = async () => {
   try {
-    const response = await axios.get('http://localhost:8000/api');
+    const response = await axios.get('http://localhost:8000/api/rungmail');
     return response.data.labels;
+  }
+  catch (error) {
+    console.error('Error getting data:', error);
+  }
+}
+
+const delete_email = async () => {
+  try {
+    //TODO: Send additional data with request
+    const response = await axios.post('http://localhost:8000/api/deleteEmails',
+      { keyword: "category" }
+    );
+    return response.data;
   }
   catch (error) {
     console.error('Error getting data:', error);
@@ -110,6 +123,7 @@ const BarChart = () => {
   return (
     <div>
       <Bar data={data} options={options} />
+      <button onClick={delete_email}>Delete Category Emails</button>
     </div >
   );
 };

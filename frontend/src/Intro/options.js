@@ -3,7 +3,7 @@ import styles from '../Intro/introduction.module.css'
 function Options() {
   return (
     <div>
-        <button>Summa Emails</button>
+        <button>Delete Emails</button>
     </div>
   );
 }

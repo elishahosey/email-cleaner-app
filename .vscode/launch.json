@@ -16,6 +16,8 @@
             "autoStartBrowser": false,
             "program": "${workspaceFolder}\\backend\\manage.py",
             "console":"integratedTerminal",
+             "cwd": "${workspaceFolder}\\backend",
+            "envFile": "${workspaceFolder}\\backend\\backend\\backend.env",
             "env": {
                 "DJANGO_SETTINGS_MODULE": "backend.settings"
               }

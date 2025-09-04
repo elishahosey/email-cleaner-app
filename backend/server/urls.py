@@ -3,5 +3,7 @@ from . import views
 
 #URL Configuration
 urlpatterns = [
-    path('', views.run_gmail)
+    path('rungmail', views.run_gmail),
+    path('deleteEmails',views.deleteEmail)
+
 ]
