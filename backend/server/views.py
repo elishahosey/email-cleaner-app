@@ -30,14 +30,18 @@ def getEmailData(service,label_data):
     emails = fetch_emails_per_label(service,labels[12])
     return emails
 
-#TODO: Add delete keyword through request
-def deleteEmail(request):
-    try:
-        service = get_service()
-        req = json.loads(request.body)
-        keyword = req.get("keyword", "")
-        delete_emails_by_label_keyword(service, keyword)
-        return JsonResponse({"status": "success", "message": "Email deleted successfully"})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+def fetchEmails(service,keyword=None,sender=None):
+    emails = service.users().messages().list(userId='me', q="clubnews@crunch.com").execute()
+    return emails
+
+#TODO: Uncomment to delete emails
+# def deleteEmail(request):
+#     try:
+#         service = get_service()
+#         req = json.loads(request.body)
+#         keyword = req.get("keyword", "")
+#         delete_emails_by_label_keyword(service, keyword)
+#         return JsonResponse({"status": "success", "message": "Email deleted successfully"})
+#     except Exception as e:
+#         return JsonResponse({"status": "error", "message": str(e)}, status=500)
     

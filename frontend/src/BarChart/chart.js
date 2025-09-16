@@ -50,6 +50,17 @@ const delete_email = async () => {
   }
 }
 
+const fetch_email = async () => {
+  try {
+    //TODO: Send additional data with request
+    const response = await axios.post('http://localhost:8000/api/fetchEmails');
+    return response.data;
+  }
+  catch (error) {
+    console.error('Error getting data:', error);
+  }
+}
+
 const BarChart = () => {
 
   const [labelsGmail, setLabelsGmail] = useState([]);
@@ -124,6 +135,7 @@ const BarChart = () => {
     <div>
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
+      <button onClick={fetch_email}>Fetch Emails</button>
     </div >
   );
 };

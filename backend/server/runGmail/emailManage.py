@@ -73,6 +73,16 @@ def main():
     
   return service
 
+
+#search by sender and keywords, both optional
+def fetch_email_details(service, sender_id=None, keywords=None):
+  try:
+    email = service.users().messages().get(userId='me', id=sender_id, format='full').execute()
+    return email
+  except HttpError as error:
+    print(f"An error occurred: {error}")
+    return None
+
 def fetch_emails_per_label(service, label_id):
   
    emails = []
