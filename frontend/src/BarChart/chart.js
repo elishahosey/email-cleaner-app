@@ -53,7 +53,7 @@ const delete_email = async () => {
 const fetch_email = async () => {
   try {
     //TODO: Send additional data with request
-    const response = await axios.post('http://localhost:8000/api/fetchEmails');
+    const response = await axios.post('http://localhost:8000/api/emailFetch',);
     return response.data;
   }
   catch (error) {

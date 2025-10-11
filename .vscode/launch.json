@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+         "name":" Launch Frontend Program",
+         "type": "node-terminal",
+        "request": "launch",
+        "command": "npm start",
+        "cwd": "${workspaceFolder}/frontend"
+        },
+        {
             "name": "Python Debugger: Django",
             "type": "python",
             "request": "launch",
@@ -21,6 +28,13 @@
             "env": {
                 "DJANGO_SETTINGS_MODULE": "backend.settings"
               }
+        }
+        
+    ],
+    "compounds": [
+        {
+            "name": "Launch Both",
+            "configurations": ["Launch Frontend Program", "Python Debugger: Django"]
         }
     ]
 }

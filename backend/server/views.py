@@ -31,7 +31,8 @@ def getEmailData(service,label_data):
     return emails
 
 def fetchEmails(service,keyword=None,sender=None):
-    emails = service.users().messages().list(userId='me', q="clubnews@crunch.com").execute()
+    emails = service.users().messages().list(userId='me', q="from:clubnews@crunch.com").execute()
+    print(emails)
     return emails
 
 #TODO: Uncomment to delete emails
