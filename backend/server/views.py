@@ -30,10 +30,30 @@ def getEmailData(service,label_data):
     emails = fetch_emails_per_label(service,labels[12])
     return emails
 
-def fetchEmails(service,keyword=None,sender=None):
-    emails = service.users().messages().list(userId='me', q="from:clubnews@crunch.com").execute()
-    print(emails)
-    return emails
+
+def fetchEmails(request):
+    try:
+        service = get_service()
+       
+        # req = json.loads(request.body)
+        keyword = request.GET.get("keyword", "")
+        sender = request.GET.get("sender", "")
+        query = ""
+        if keyword and sender:
+            query = f'from:{sender} {keyword}'
+        elif keyword:
+            query = keyword
+        elif sender:
+            query = f'from:{sender}'
+        
+        emails = service.users().messages().list(userId='me', q={query}).execute()
+        
+        #log emails in a separate file for testing
+        with open('./fetched_emails.json', 'w') as f:
+            json.dump(emails, f, indent=4)
+        return JsonResponse({"status": "success"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 #TODO: Uncomment to delete emails
 # def deleteEmail(request):

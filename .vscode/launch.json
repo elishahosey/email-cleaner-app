@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-         "name":" Launch Frontend Program",
+         "name":"Launch Frontend Program",
          "type": "node-terminal",
         "request": "launch",
         "command": "npm start",

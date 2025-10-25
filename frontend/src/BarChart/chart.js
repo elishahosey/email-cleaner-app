@@ -39,7 +39,6 @@ const get_emailDataset = async () => {
 
 const delete_email = async () => {
   try {
-    //TODO: Send additional data with request
     const response = await axios.post('http://localhost:8000/api/deleteEmails',
       { keyword: "category" }
     );
@@ -53,7 +52,15 @@ const delete_email = async () => {
 const fetch_email = async () => {
   try {
     //TODO: Send additional data with request
-    const response = await axios.post('http://localhost:8000/api/emailFetch',);
+    const response = await axios.get('http://localhost:8000/api/emailFetch',
+      { params:
+      {
+        keyword: "",
+        sender:"clubnews@crunch.com",
+        query:""
+      }
+    }
+    );
     return response.data;
   }
   catch (error) {
@@ -135,6 +142,7 @@ const BarChart = () => {
     <div>
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
+      TODO: have dropdown for senders to choose or in groups
       <button onClick={fetch_email}>Fetch Emails</button>
     </div >
   );
