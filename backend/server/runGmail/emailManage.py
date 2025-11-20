@@ -202,7 +202,8 @@ def move_emails_to_label(service, messages, label_name="TrainingDumpForApp"):
     """
     
     #Check in cached labels first
-    cached_labels = json.load(open('backend/cache_labels.json'))
+    
+    cached_labels = json.load(open('cache_labels.json'))
     label_id = None
     for label in cached_labels:
         if label['name'] == label_name:
@@ -211,7 +212,7 @@ def move_emails_to_label(service, messages, label_name="TrainingDumpForApp"):
           
           
     #reference fetched emails to move
-    fetched_emails=json.load(open('backend/server/runGmail/fetched_emails.json'))
+    fetched_emails=json.load(open('fetched_emails.json'))
     messages = fetched_emails['messages']
     #Get Label ID from parameter from the labelname
     #labels = service.users().labels().list(userId='me').execute()

@@ -63,9 +63,8 @@ def fetchEmails(request):
         
         
         #move fetched emails to a training for ML
-        label_name=''
          
-        move_emails_to_label(service,msg,label_name)
+        move_emails_to_label(service,msg)
         # #log emails in a separate file for testing
         # with open('./fetched_emails.json', 'w') as f:
         #     json.dump(emails, f, indent=4)
