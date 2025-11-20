@@ -1,10 +1,16 @@
-[x] Create one api endpoint and see if i can branch off of that -> ease maintainability later
-[] Create database for ML playground
-[x] Pass parameters for delete function, with keywords too
-[] items i don't want to mess up: 
+-[x] Create one api endpoint and see if i can branch off of that -> ease maintainability later
+-[] Create database for ML playground
+-[x] Pass parameters for delete function, with keywords too
+-[x] items i don't want to mess up: Create fetch function
     crunch, prudential[
         <anything ending in @crunch.com> , 
         anything ending in <@prudential.com>
         anything related to bill/payments
         anything related to documents
         ]
+
+- [ ] Implement an ML algorithm
+    -[] Send some emails to a json file for testing fetched-emails
+- [ ] Make UI look better
+- [x] Add options to manipulate emails like deletion, etc. 
+

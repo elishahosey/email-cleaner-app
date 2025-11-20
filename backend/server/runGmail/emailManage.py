@@ -1,5 +1,6 @@
 import os.path
-
+import json
+from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -95,10 +96,6 @@ def fetch_emails_per_label(service, label_id):
         response = service.users().messages().list(userId='me', labelIds=[label_id], pageToken=page_token).execute()
         emails.extend(response.get('messages', []))
         
-        '''
-        Example of response
-        Fetched emails [{'id': '18cd007cd4b5840e', 'threadId': '18cd007cd4b5840e'}, {'id': '18ccbdee6fd7191f', 'threadId': '18ccbdee6fd7191f'}, {'id': '18ccbde9532443a1', 'threadId': '18ccbde9532443a1'}]
-        '''
    return emails
 
 def get_email_length(emails):
@@ -195,3 +192,41 @@ def delete_emails_by_label_keyword(
 
     except HttpError as e:
         print(f"Gmail API error: {e}")
+        
+
+#TODO: Pass messages from fetched_emails.json
+def move_emails_to_label(service, messages, label_name="TrainingDumpForApp"):
+    """
+    Moves the given Gmail message IDs to the specified label.
+    If the label doesn't exist, it creates it.
+    """
+    
+    #Check in cached labels first
+    cached_labels = json.load(open('backend/cache_labels.json'))
+    label_id = None
+    for label in cached_labels:
+        if label['name'] == label_name:
+            label_id = label['id']
+            break
+          
+          
+    #reference fetched emails to move
+    fetched_emails=json.load(open('backend/server/runGmail/fetched_emails.json'))
+    messages = fetched_emails['messages']
+    #Get Label ID from parameter from the labelname
+    #labels = service.users().labels().list(userId='me').execute()
+
+    message_ids = [m['id'] for m in messages if 'id' in m]
+
+    
+    if message_ids:
+        batch = {
+            'ids': message_ids,
+            'addLabelIds': [label_id],
+            #'removeLabelIds': ['INBOX']  # optional
+        }
+        service.users().messages().batchModify(userId='me', body=batch).execute()
+        print(f"📬 Moved {len(message_ids)} emails to label '{label_name}'")
+    else:
+        print("⚠️ No valid message IDs found.")
+        

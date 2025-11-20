@@ -3,7 +3,8 @@ from django.http import HttpResponse
 import json
 import subprocess
 from django.http import JsonResponse
-from .runGmail.emailManage import main, fetch_user_labels, get_emailLengthForLabels, fetch_emails_per_label,delete_emails_by_label_keyword
+from .runGmail.emailManage import *
+#from .runGmail.emailManage import main, fetch_user_labels, get_emailLengthForLabels, fetch_emails_per_label,move_emails_to_label,delete_emails_by_label_keyword
 
 
 def get_service():
@@ -12,12 +13,16 @@ def get_service():
 
 def run_gmail(request):
         try:
+            
             # Initialize the Gmail service
             service = get_service()
             labels = fetch_user_labels(service)
             
+            #TODO: make this optional if no cache_labels json file doesn't exist
             label_data = get_emailLengthForLabels(labels,service)
             email_data = getEmailData(service,label_data)
+
+           
             
             return JsonResponse({"status": "success", "labels": label_data, "emails": email_data})
         
@@ -33,8 +38,15 @@ def getEmailData(service,label_data):
 
 def fetchEmails(request):
     try:
+        
+        # grab one block from this path
+        fetchedEmailPath = '../backend/fetched_emails.json'
+        json_fetched_emails = json.load(open(fetchedEmailPath))
+        msg = json_fetched_emails['messages']
+        # # print(email_data)
+        
         service = get_service()
-       
+        #formatting my request for GMail API
         # req = json.loads(request.body)
         keyword = request.GET.get("keyword", "")
         sender = request.GET.get("sender", "")
@@ -46,12 +58,18 @@ def fetchEmails(request):
         elif sender:
             query = f'from:{sender}'
         
-        emails = service.users().messages().list(userId='me', q={query}).execute()
+        #referencing specific emails from GMail API
+        requested_emails = service.users().messages().list(userId='me', q={query}).execute()
         
-        #log emails in a separate file for testing
-        with open('./fetched_emails.json', 'w') as f:
-            json.dump(emails, f, indent=4)
-        return JsonResponse({"status": "success"})
+        
+        #move fetched emails to a training for ML
+        label_name=''
+         
+        move_emails_to_label(service,msg,label_name)
+        # #log emails in a separate file for testing
+        # with open('./fetched_emails.json', 'w') as f:
+        #     json.dump(emails, f, indent=4)
+        return JsonResponse({"status": "success"}, filteredEmails=requested_emails)
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
 

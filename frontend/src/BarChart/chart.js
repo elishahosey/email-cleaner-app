@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Autocomplete, Container, TextField, Typography } from "@mui/material";
+import { Box } from "@mui/system";
 import styles from '../BarChart/chart.module.css';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
@@ -143,6 +145,10 @@ const BarChart = () => {
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
       TODO: have dropdown for senders to choose or in groups
+
+    {/* <Autocomplete
+      /> */}
+
       <button onClick={fetch_email}>Fetch Emails</button>
     </div >
   );
