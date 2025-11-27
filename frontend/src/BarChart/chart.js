@@ -76,13 +76,15 @@ const fetch_email = async () => {
 const BarChart = () => {
 
   const [labelsGmail, setLabelsGmail] = useState([]);
+  const [senders, setSenders] = useState([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await get_emailDataset();
       //just grab the labels from the data
       setLabelsGmail(data.labels);
-      gatherSenders(data.senders);
+      setSenders(data.senders|| []);
 
     };
 
@@ -106,13 +108,6 @@ const BarChart = () => {
         data: Object.values(labelsGmail),
       },
     ],
-  };
-
-  // List of subscribers from the barchart data
-  const gatherSenders = (data) => {
-    const senders = data;
-    console.log("Senders: ", senders);
-    return senders;
   };
 
 
@@ -158,11 +153,12 @@ const BarChart = () => {
     <div>
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
-
+    
       <Autocomplete
         disablePortal
-        options={gatherSenders || []}
-        sx={{ width: 500, marginTop: 2 }}
+        options={senders}
+         sx={{
+          height: 40, marginTop: 2 }}
         renderInput={(params) => <TextField {...params} label="Email Senders" />}
       />
 
