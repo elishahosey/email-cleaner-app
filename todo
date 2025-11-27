@@ -13,4 +13,7 @@
     -[] Send some emails to a json file for testing fetched-emails
 - [ ] Make UI look better
 - [x] Add options to manipulate emails like deletion, etc. 
+-[ x] Add sender dropdown to filter out of the messages
+ - [] handle the rate limit for Gmail API
+ - [] Update the logic of API to emailManage.py rather than views.py
 

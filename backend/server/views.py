@@ -21,10 +21,11 @@ def run_gmail(request):
             #TODO: make this optional if no cache_labels json file doesn't exist
             label_data = get_emailLengthForLabels(labels,service)
             email_data = getEmailData(service,label_data)
+            senders=grabSubscribersFromEmails(service)
 
            
             
-            return JsonResponse({"status": "success", "labels": label_data, "emails": email_data})
+            return JsonResponse({"status": "success", "labels": label_data, "emails": email_data,"senders":senders})
         
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
@@ -32,8 +33,51 @@ def run_gmail(request):
 
 def getEmailData(service,label_data):
     labels = list(label_data.keys())
+    #TODO: make it get all labels instead of hardcoding index 12
     emails = fetch_emails_per_label(service,labels[12])
     return emails
+
+#collect distinct message IDs from multiple labels
+def collect_message_ids(service, label_ids):
+    all_ids = []
+
+    for label_id in label_ids:
+        response = service.users().messages().list(
+            userId='me',
+            labelIds=[label_id['id']]
+        ).execute()
+
+        ids = [msg['id'] for msg in response.get('messages', [])]
+        all_ids.extend(ids)
+
+    print("Collected Message IDs: ")
+    return all_ids
+
+def get_email_senders(service, msg_id):
+    sender = []
+    for i in msg_id:
+        message = service.users().messages().get(userId='me', id=i, format='metadata', metadataHeaders=['From']).execute()
+        headers = message.get('payload', {}).get('headers', [])    
+        for header in headers:
+            if header['name'] == 'From':
+                s = header['value']
+                sender.append(s)
+    print("Collected Senders: ")
+    final_senders = list(set(sender))
+    return final_senders
+
+#grab subscribers from collected messages
+def grabSubscribersFromEmails(service):
+    cached_labels_path = '../backend/cache_labels.json'
+    with open(cached_labels_path, 'r') as f:
+        cached_labels = json.load(f)
+    
+    
+    msgIds = collect_message_ids(service, cached_labels)
+    collect_senders = get_email_senders(service, msgIds)
+    
+    print("Final Collected Senders: ")
+    return collect_senders
 
 
 def fetchEmails(request):

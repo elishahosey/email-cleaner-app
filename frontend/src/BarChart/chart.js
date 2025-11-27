@@ -32,7 +32,9 @@ ChartJS.register(
 const get_emailDataset = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/rungmail');
-    return response.data.labels;
+    return response.data; //return the whole response
+    // console.log("Response Data Labels: ", response.data);
+    // return response.data.labels;
   }
   catch (error) {
     console.error('Error getting data:', error);
@@ -55,13 +57,14 @@ const fetch_email = async () => {
   try {
     //TODO: Send additional data with request
     const response = await axios.get('http://localhost:8000/api/emailFetch',
-      { params:
       {
-        keyword: "",
-        sender:"clubnews@crunch.com",
-        query:""
+        params:
+        {
+          keyword: "",
+          sender: "clubnews@crunch.com",
+          query: ""
+        }
       }
-    }
     );
     return response.data;
   }
@@ -76,19 +79,22 @@ const BarChart = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await get_emailDataset();  // Wait for the data
-      setLabelsGmail(data);  // Store the data in the state
+      const data = await get_emailDataset();
+      //just grab the labels from the data
+      setLabelsGmail(data.labels);
+      gatherSenders(data.senders);
+
     };
 
     fetchData();
   }, []);
-  
+
   const truncateLabel = (label, maxLength = 15) => {
     return label.length > maxLength ? label.slice(0, maxLength) + '...' : label;
   };
-  
+
   const shortenLabels = Object.keys(labelsGmail).map(label => truncateLabel(label));
-  
+
   const data = {
     labels: shortenLabels,
     datasets: [
@@ -101,6 +107,14 @@ const BarChart = () => {
       },
     ],
   };
+
+  // List of subscribers from the barchart data
+  const gatherSenders = (data) => {
+    const senders = data;
+    console.log("Senders: ", senders);
+    return senders;
+  };
+
 
   const options = {
     elements: {
@@ -144,10 +158,13 @@ const BarChart = () => {
     <div>
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
-      TODO: have dropdown for senders to choose or in groups
 
-    {/* <Autocomplete
-      /> */}
+      <Autocomplete
+        disablePortal
+        options={gatherSenders || []}
+        sx={{ width: 500, marginTop: 2 }}
+        renderInput={(params) => <TextField {...params} label="Email Senders" />}
+      />
 
       <button onClick={fetch_email}>Fetch Emails</button>
     </div >
