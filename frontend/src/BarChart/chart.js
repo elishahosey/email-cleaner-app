@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Autocomplete, Container, TextField, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, height } from "@mui/system";
 import styles from '../BarChart/chart.module.css';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
@@ -33,7 +33,7 @@ const get_emailDataset = async () => {
   try {
     const response = await axios.get('http://localhost:8000/api/rungmail');
     return response.data; //return the whole response
-    // console.log("Response Data Labels: ", response.data);
+    console.log("Response Data Labels: ", response.data);
     // return response.data.labels;
   }
   catch (error) {
@@ -66,6 +66,7 @@ const fetch_email = async () => {
         }
       }
     );
+    // console.log("Fetch Email Response: ", response.data);
     return response.data;
   }
   catch (error) {
@@ -84,7 +85,7 @@ const BarChart = () => {
       const data = await get_emailDataset();
       //just grab the labels from the data
       setLabelsGmail(data.labels);
-      setSenders(data.senders|| []);
+      setSenders(data.senders || []);
 
     };
 
@@ -109,6 +110,8 @@ const BarChart = () => {
       },
     ],
   };
+
+
 
 
   const options = {
@@ -153,16 +156,16 @@ const BarChart = () => {
     <div>
       <Bar data={data} options={options} />
       <button onClick={delete_email}>Delete Category Emails</button>
-    
-      <Autocomplete
-        disablePortal
-        options={senders}
-         sx={{
-          height: 40, marginTop: 2 }}
-        renderInput={(params) => <TextField {...params} label="Email Senders" />}
-      />
-
       <button onClick={fetch_email}>Fetch Emails</button>
+        <Autocomplete
+          options={senders}
+          getOptionLabel={(option) => option}
+          size="small"
+          sx={{
+            width: 500
+          }}
+          renderInput={(params) => <TextField {...params} label="Email Senders" />}
+        />
     </div >
   );
 };

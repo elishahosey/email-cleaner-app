@@ -7,6 +7,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google.auth.exceptions import RefreshError
+from pathlib import Path
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly",
@@ -84,19 +85,47 @@ def fetch_email_details(service, sender_id=None, keywords=None):
     print(f"An error occurred: {error}")
     return None
 
-def fetch_emails_per_label(service, label_id):
-  
-   emails = []
-   response = service.users().messages().list(userId='me', labelIds=[label_id]).execute()
-   emails.extend(response.get('messages', [])) #adding result of response to email group
 
-   #Too many emails
-   while 'nextPageToken' in response:
-        page_token = response['nextPageToken']
-        response = service.users().messages().list(userId='me', labelIds=[label_id], pageToken=page_token).execute()
-        emails.extend(response.get('messages', []))
-        
-   return emails
+def load_label_cache(path="./cached_labels.json"):
+    with open(path, "r", encoding="utf-8") as f:
+        labels = json.load(f)
+
+    # name → id
+    return {lbl["name"]: lbl["id"] for lbl in labels}
+
+def fetch_emails_per_label(service, label):
+    label_lookup = load_label_cache()
+    # if label_name is None:
+    #     label_lookup = load_label_cache()
+    # else:
+    # label_id = label_lookup.get(label)
+
+    label_id = label
+    emails = []
+    page_token = None
+    seen = set()
+
+    while True:
+        if page_token in seen:
+            raise RuntimeError(
+                f"Repeating page token for label ({label_id}): {page_token!r}"
+            )
+        seen.add(page_token)
+
+        response = service.users().messages().list(
+            userId="me",
+            labelIds=[label_id],
+            pageToken=page_token,
+            maxResults=500,
+        ).execute()
+
+        emails.extend(response.get("messages", []))
+        page_token = response.get("nextPageToken")
+
+        if not page_token:
+            break
+
+    return emails
 
 def get_email_length(emails):
   if len(emails) == 0:
@@ -106,14 +135,24 @@ def get_email_length(emails):
   
 
 def fetch_user_labels(service):
-  results = service.users().labels().list(userId="me").execute()
-  labels = results.get("labels", [])
-  
-  if not labels:
-      print("No labels found.")
-      return None
-  
-  return labels
+    cache_path="./cached_labels.json"
+    results = service.users().labels().list(userId="me").execute()
+    labels = results.get("labels", [])
+
+    if not labels:
+        print("No labels found.")
+        return []
+
+    # write cache
+    cache_file = Path(cache_path)
+    cache_file.write_text(
+        json.dumps(labels, indent=2),
+        encoding="utf-8"
+    )
+
+    print(f"Cached {len(labels)} labels → {cache_file.resolve()}")
+    return labels
+
 
 #labels + email length
 def get_emailLengthForLabels(labels,service):
@@ -231,3 +270,10 @@ def move_emails_to_label(service, messages, label_name="TrainingDumpForApp"):
     else:
         print("⚠️ No valid message IDs found.")
         
+# def fetch_emails(service, labels):
+#     all_emails = {}
+#     LABEL_LOOKUP = load_label_cache()
+#     for label in labels:
+#         emails = fetch_emails_per_label(service, label)
+#         all_emails[label] = emails
+#     return all_emails

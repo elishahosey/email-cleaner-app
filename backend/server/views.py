@@ -17,10 +17,12 @@ def run_gmail(request):
             # Initialize the Gmail service
             service = get_service()
             labels = fetch_user_labels(service)
+
+            
             
             #TODO: make this optional if no cache_labels json file doesn't exist
             label_data = get_emailLengthForLabels(labels,service)
-            email_data = getEmailData(service,label_data)
+            email_data = getEmailData(service)
             senders=grabSubscribersFromEmails(service)
 
            
@@ -31,11 +33,32 @@ def run_gmail(request):
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 
-def getEmailData(service,label_data):
-    labels = list(label_data.keys())
-    #TODO: make it get all labels instead of hardcoding index 12
-    emails = fetch_emails_per_label(service,labels[12])
-    return emails
+def getEmailData(service):
+    cache_path="./cached_labels.json"
+    # Load cached label objects [{id, name, ...}]
+    with open(cache_path, "r", encoding="utf-8") as f:
+        cached_labels = json.load(f)
+
+    emails_by_label = {}
+
+    for lbl in cached_labels:
+        label_name = lbl.get("name")
+        label_id = lbl.get("id")
+
+        if not isinstance(label_id, str) or not label_id.strip():
+            print(f"[SKIP] Invalid label id for {label_name}: {label_id!r}")
+            continue
+
+        try:
+            emails_by_label[label_name] = fetch_emails_per_label(
+                service, label_id.strip()
+            )
+        except Exception as e:
+            print(f"[FAIL] {label_name} ({label_id}): {e}")
+            continue
+
+    return emails_by_label
+
 
 #collect distinct message IDs from multiple labels
 def collect_message_ids(service, label_ids):
