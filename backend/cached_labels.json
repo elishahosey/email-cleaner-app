@@ -100,55 +100,5 @@
     "id": "Label_2979067777648255447",
     "name": "TrainingDumpForApp",
     "type": "user"
-  },
-  {
-    "id": "Label_436943674773007826",
-    "name": "GraduationUHV",
-    "type": "user"
-  },
-  {
-    "id": "Label_538571089434074082",
-    "name": "Pet",
-    "messageListVisibility": "hide",
-    "labelListVisibility": "labelShow",
-    "type": "user"
-  },
-  {
-    "id": "Label_5847590971132428924",
-    "name": "[Awaiting Response]",
-    "messageListVisibility": "show",
-    "labelListVisibility": "labelShow",
-    "type": "user",
-    "color": {
-      "textColor": "#ffffff",
-      "backgroundColor": "#ffad46"
-    }
-  },
-  {
-    "id": "Label_7048897058329304583",
-    "name": "[ToRead]",
-    "messageListVisibility": "show",
-    "labelListVisibility": "labelShow",
-    "type": "user",
-    "color": {
-      "textColor": "#ffffff",
-      "backgroundColor": "#4986e7"
-    }
-  },
-  {
-    "id": "Label_8606571225109927004",
-    "name": "General Motors",
-    "type": "user"
-  },
-  {
-    "id": "Label_868644684173715393",
-    "name": "[FollowUp]",
-    "messageListVisibility": "hide",
-    "labelListVisibility": "labelShow",
-    "type": "user",
-    "color": {
-      "textColor": "#594c05",
-      "backgroundColor": "#fbe983"
-    }
   }
 ]
