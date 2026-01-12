@@ -1,3 +1,9 @@
 [] Create one api endpoint and see if i can branch off of that -> ease maintainability later
 [] Create database for ML playground
 [] Pass parameters for delete function, with keywords too
+Training Dump Label
+ {
+    "id": "Label_2979067777648255447",
+    "name": "TrainingDumpForApp",
+    "type": "user"
+  }
