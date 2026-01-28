@@ -1,6 +1,7 @@
 import os
 import pandas as pd
-from backend.server.runGmail.emailManage import main as gmail_main,fetch_emails_per_label
+from server.runGmail.emailManage import main as gmail_main, fetch_emails_per_label
+
 
 def run_model():
     service = gmail_main() 
