@@ -15,12 +15,20 @@
             "django": true,
             "autoStartBrowser": false,
             "program": "${workspaceFolder}\\backend\\manage.py",
-            "console":"integratedTerminal",
-             "cwd": "${workspaceFolder}\\backend",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}\\backend",
             "envFile": "${workspaceFolder}\\backend\\backend\\backend.env",
             "env": {
                 "DJANGO_SETTINGS_MODULE": "backend.settings"
-              }
+            }
+        },
+        {
+            "name": "Debug model.main (module)",
+            "type": "python",
+            "request": "launch",
+            "module": "backend.server.model.main",
+            "cwd": "",
+            "justMyCode": false
         }
     ]
 }

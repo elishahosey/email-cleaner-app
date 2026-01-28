@@ -4,11 +4,17 @@ import json
 import subprocess
 from django.http import JsonResponse
 from .runGmail.emailManage import main, fetch_user_labels, get_emailLengthForLabels, fetch_emails_per_label,delete_emails_by_label_keyword
+#TODO: add server/model/main.py functions for data cleaning and analysis
+from server.model.main import run_model
 
 
 def get_service():
     service = main()
     return service
+
+# def get_model_data():
+#     run_model()
+#     return "Model data processed"
 
 def run_gmail(request):
         try:
