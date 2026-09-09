@@ -1,4 +1,5 @@
 const { spawn } = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const frontendDir = path.resolve(__dirname, '..');
@@ -10,7 +11,10 @@ const bundledPython = path.join(
   isWindows ? 'Scripts' : 'bin',
   isWindows ? 'python.exe' : 'python'
 );
-const python = process.env.PYTHON || bundledPython;
+const configuredPython = process.env.PYTHON;
+const python = configuredPython && fs.existsSync(configuredPython)
+  ? configuredPython
+  : bundledPython;
 const reactScripts = path.join(
   frontendDir,
   'node_modules',
@@ -52,6 +56,9 @@ function stop(exitCode = 0) {
   setTimeout(() => process.exit(exitCode), 250);
 }
 
+if (configuredPython && configuredPython !== python) {
+  console.warn(`[Email Cleaner] Ignoring missing PYTHON override: ${configuredPython}`);
+}
 console.log(`[Email Cleaner] Using Python: ${python}`);
 console.log('[Email Cleaner] Starting Django on http://localhost:8000');
 run(python, ['manage.py', 'runserver', '127.0.0.1:8000'], backendDir, 'backend');
