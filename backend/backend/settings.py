@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(dotenv_path='../backend/backend.env')
+load_dotenv(dotenv_path=BASE_DIR / 'backend.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -118,8 +118,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 #Database Credentials
 
-DB_ENGINE = os.getenv('DB_ENGINE')
-DB_NAME = os.getenv('DB_NAME')
+DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.sqlite3')
+DB_NAME = os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3')
 DB_HOST = os.getenv('DB_HOST')
 PWD = os.getenv('DB_PWD')
 PORT = os.getenv('PORT')
@@ -128,11 +128,11 @@ USER = os.getenv('USER')
 DATABASES = {
     'default': {
         'ENGINE': DB_ENGINE,
-        'NAME': DB_NAME, 
-        'USER': USER,
-        'PASSWORD': PWD,
-        'HOST': DB_HOST, 
-        'PORT': PORT,
+        'NAME': DB_NAME,
+        'USER': USER or '',
+        'PASSWORD': PWD or '',
+        'HOST': DB_HOST or '',
+        'PORT': PORT or '',
     }
 }
 

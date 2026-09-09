@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Intro from './Intro/introduction';
 import BarChart from './BarChart/chart'

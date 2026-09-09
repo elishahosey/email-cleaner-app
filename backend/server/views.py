@@ -1,49 +1,66 @@
-from django.shortcuts import render
-from django.http import HttpResponse
 import json
-import subprocess
-from django.http import JsonResponse
-from .runGmail.emailManage import main, fetch_user_labels, get_emailLengthForLabels, fetch_emails_per_label,delete_emails_by_label_keyword
-#TODO: add server/model/main.py functions for data cleaning and analysis
-from server.model.main import run_model
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_GET, require_POST
 
+from .gmail_client import get_service
+from .triage_service import (
+    apply_approved_action,
+    build_dashboard,
+    build_review_queue,
+    build_summary,
+)
+from .training_export import TRAINING_LABEL, export_training_jsonl
 
-def get_service():
-    service = main()
-    return service
-
-# def get_model_data():
-#     run_model()
-#     return "Model data processed"
-
-def run_gmail(request):
-        try:
-            # Initialize the Gmail service
-            service = get_service()
-            labels = fetch_user_labels(service)
-            
-            label_data = get_emailLengthForLabels(labels,service)
-            email_data = getEmailData(service,label_data)
-            
-            return JsonResponse({"status": "success", "labels": label_data, "emails": email_data})
-        
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
-
-def getEmailData(service,label_data):
-    labels = list(label_data.keys())
-    emails = fetch_emails_per_label(service,labels[12])
-    return emails
-
-#TODO: Add delete keyword through request
-def deleteEmail(request):
+@require_GET
+def dashboard(request):
     try:
-        service = get_service()
-        req = json.loads(request.body)
-        keyword = req.get("keyword", "")
-        delete_emails_by_label_keyword(service, keyword)
-        return JsonResponse({"status": "success", "message": "Email deleted successfully"})
+        return JsonResponse({"status": "success", **build_dashboard(get_service())})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    
+
+
+@require_GET
+def summary(request):
+    try:
+        return JsonResponse({"status": "success", "summary": build_summary(get_service())})
+    except Exception as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=500)
+
+
+@require_GET
+def review_queue(request):
+    try:
+        return JsonResponse({"status": "success", **build_review_queue(get_service())})
+    except Exception as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=500)
+
+
+@require_GET
+def export_training_data(request):
+    try:
+        content, count = export_training_jsonl(get_service())
+        response = HttpResponse(content, content_type="application/x-ndjson; charset=utf-8")
+        response["Content-Disposition"] = 'attachment; filename="training-dump-for-app.jsonl"'
+        response["X-Exported-Message-Count"] = str(count)
+        response["X-Source-Gmail-Label"] = TRAINING_LABEL
+        return response
+    except ValueError as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=404)
+    except Exception as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=500)
+
+
+@require_POST
+def apply_actions(request):
+    try:
+        payload = json.loads(request.body or "{}")
+        result = apply_approved_action(get_service(), payload)
+        return JsonResponse({"status": "success", **result})
+    except (ValueError, json.JSONDecodeError) as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=400)
+    except Exception as error:
+        return JsonResponse({"status": "error", "message": str(error)}, status=500)
+
+
+# Backward-compatible alias for bookmarks/older frontend builds.
+run_gmail = dashboard

@@ -16,11 +16,6 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CREDENTIALS_FILE = os.path.join(BASE_DIR, 'credentials.json')
 TOKEN_FILE = os.path.join(BASE_DIR, 'token.json')
 
-# Print statements to debug file paths
-print("Base Directory:", BASE_DIR)
-print("Credentials File Path:", CREDENTIALS_FILE)
-print("Token File Path:", TOKEN_FILE)
-
 def main():
   """Gather all emails and store 
   it into respective subjects
@@ -72,6 +67,14 @@ def main():
     print(f"An error occurred: {error}")
     
   return service
+
+def gather_email_data(service, email_id):
+    try:
+        email = service.users().messages().get(userId='me', id=email_id, format='full').execute()
+        return email
+    except HttpError as error:
+        print(f"An error occurred while fetching email {email_id}: {error}")
+        return None
 
 def fetch_emails_per_label(service, label_id):
   

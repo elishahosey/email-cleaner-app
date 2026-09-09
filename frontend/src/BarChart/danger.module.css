@@ -1,0 +1,44 @@
+.dangerBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -6px 0 20px;
+  padding: 13px;
+  border: 1px solid #5d252c;
+  border-left: 3px solid #ff4d5f;
+  background: #ff4d5f0a;
+}
+
+.dangerBar > div {
+  display: grid;
+  gap: 5px;
+  margin-right: auto;
+}
+
+.dangerBar strong {
+  color: #ff8490;
+  font: 700 10px monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.dangerBar small {
+  color: #8e7375;
+  font: 9px monospace;
+}
+
+.candidateButton {
+  border-color: #a06970;
+  background: transparent;
+  color: #ffabb3;
+}
+
+.trashButton {
+  border-color: #ff4d5f;
+  background: #ff4d5f;
+  color: #170104;
+}
+
+@media (max-width: 760px) {
+  .dangerBar { align-items: stretch; flex-direction: column; }
+}
